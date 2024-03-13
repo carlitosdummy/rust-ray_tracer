@@ -7,6 +7,7 @@ use crate::ray::*;
 use crate::vec3::*;
 use crate::color::*;
 use crate::rtweekend::*;
+use crate::material::*;
 
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -98,18 +99,27 @@ impl Camera {
     
 
     fn ray_color(r: &Ray, depth: i32 ,world: &dyn Hittable) -> Color {
-        let mut rec: HitRecord = HitRecord::default();
-
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
+    
+        let mut rec = HitRecord::default();
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let direction: Vec3 = rec.normal + Vec3::random_unit_vector();
-            return Camera::ray_color(&Ray::new(rec.p, direction), depth -1,world) * 0.9;
+            if let Some(material) = &rec.mat {
+                let mut scattered = Ray::default();
+                let mut attenuation = Color::zero();
+                if material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+                    return attenuation * Camera::ray_color(&scattered, depth - 1, world);
+                }
+            }
+    
+            let direction = rec.normal + Vec3::random_unit_vector();
+            return Camera::ray_color(&Ray::new(rec.p, direction), depth - 1, world) * 0.9;
         }
-
-        let unit_direction: Vec3 = Vec3::unit_vector(r.direction());
-        let a: f64 = 0.5 * (unit_direction.y() + 1.0);
+    
+        let unit_direction = Vec3::unit_vector(r.direction());
+        let a = 0.5 * (unit_direction.y() + 1.0);
         Color::new(1.0, 1.0, 1.0) * (1.0 - a) + (Color::new(0.5, 0.7, 1.0) * a)
     }
+    
 }

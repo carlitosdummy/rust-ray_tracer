@@ -7,6 +7,10 @@ use crate::interval::*;
 pub struct Color(pub Vec3);
 
 impl Color {
+    pub fn zero() -> Self {
+        Color(Vec3::new(0.0, 0.0, 0.0))
+    }
+
     pub fn new(r: f64, g: f64, b: f64) -> Color {
         Color(Vec3::new(r, g, b))
     }
@@ -16,6 +20,18 @@ impl Mul<f64> for Color {
 
     fn mul(self, t: f64) -> Color {
         Color::new(self.0.e[0] * t, self.0.e[1] * t, self.0.e[2] * t)
+    }
+}
+
+impl Mul for Color {
+    type Output = Color;
+
+    fn mul(self, other: Self) -> Self {
+        Color::new(
+            self.0.x() * other.0.x(),
+            self.0.y() * other.0.y(),
+            self.0.z() * other.0.z(),
+        )
     }
 }
 
@@ -57,7 +73,7 @@ pub fn write_color<W: Write>(mut out: W, pixel_color: Color, samples_per_pixel: 
     g = linear_to_gamma(g);
     b = linear_to_gamma(b);
 
-    
+
     let intensity: Interval = Interval::new(0.000, 0.999);
     // Write the translated [0,255] value of each color component.
     write!(
