@@ -9,8 +9,6 @@ Ray tracing is a rendering technique used to generate realistic images by tracin
 
 
 ## Features
-
-- Implements basic ray tracing concepts such as rays, vectors, and surfaces.
 - Supports rendering spheres, diffuse materials, and simple lighting.
 - Utilizes Rust's features for memory safety and performance.
 
@@ -36,7 +34,3 @@ To run the project:
 
 - Peter Shirley for creating the original **Ray Tracing in a Weekend** series.
 - The Rust community for providing excellent resources and support for Rust developers.
-
-## License
-
-This project is licensed under the MIT License
